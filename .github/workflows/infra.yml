@@ -37,7 +37,9 @@ jobs:
         run: pulumi login
 
       - name: Pulumi stack select
-        run: pulumi stack select amirul/aws-k3s-ansible/dev
+        run:  |
+          cd aws-k3s-ansible
+          pulumi stack select amirul/aws-k3s-ansible/dev
 
       - name: Pulumi refresh
         run: |
