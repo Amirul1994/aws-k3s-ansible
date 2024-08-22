@@ -54,7 +54,7 @@ jobs:
       - name: Save Pulumi outputs
         id: pulumi_outputs
         run: |
-          GIT_RUNNER_IP=$(pulumi stack output git_runner_pulic_ip)
+          GIT_RUNNER_IP=$(pulumi stack output git_runner_public_ip)
           MASTER_IP=$(pulumi stack output master_private_ip)
           WORKER1_IP=$(pulumi stack output worker1_private_ip)
           WORKER2_IP=$(pulumi stack output worker2_private_ip)
