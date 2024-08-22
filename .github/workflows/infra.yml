@@ -38,10 +38,8 @@ jobs:
 
       - name: Pulumi stack select
         run:  |
-          
           pulumi stack select amirul/aws-k3s-ansible/dev
 
       - name: Pulumi refresh
         run: |
-          
           pulumi refresh --yes
