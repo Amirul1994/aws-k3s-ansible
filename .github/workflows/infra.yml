@@ -38,10 +38,10 @@ jobs:
 
       - name: Pulumi stack select
         run:  |
-          cd aws-k3s-ansible
+          cd infra
           pulumi stack select amirul/aws-k3s-ansible/dev
 
       - name: Pulumi refresh
         run: |
-          cd aws-k3s-ansible
+          cd infra
           pulumi refresh --yes
