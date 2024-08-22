@@ -43,3 +43,7 @@ jobs:
       - name: Pulumi refresh
         run: |
           pulumi refresh --yes
+      
+      - name: Pulumi up
+        run: |
+          pulumi up --yes
