@@ -1,3 +1,4 @@
+import os
 import pulumi
 import pulumi_aws as aws
 import pulumi_aws.ec2 as ec2
@@ -79,3 +80,59 @@ private_route_table_association = ec2.RouteTableAssociation(
     subnet_id=private_subnet.id,
     route_table_id=private_route_table.id
 )
+
+
+
+# Security Group for allowing SSH and k3s traffic
+security_group = aws.ec2.SecurityGroup("k3s-sgrp",
+    description='Enable SSH and K3s access',
+    vpc_id=vpc.id,
+    ingress=[
+        {
+            "protocol": "tcp",
+            "from_port": 22,
+            "to_port": 22,
+            "cidr_blocks": ["0.0.0.0/0"],
+        },
+        {
+            "protocol": "tcp",
+            "from_port": 6443,
+            "to_port": 6443,
+            "cidr_blocks": ["0.0.0.0/0"],
+        },
+    ],
+    egress=[{
+        "protocol": "-1",
+        "from_port": 0,
+        "to_port": 0,
+        "cidr_blocks": ["0.0.0.0/0"],
+    }],
+    tags={
+        'Name': 'k3s-sgrp',
+    }
+)
+
+
+#key pair
+public_key = os.getenv("PUBLIC_KEY")
+
+
+# Create the EC2 KeyPair using the public key
+key_pair = aws.ec2.KeyPair("my-key-pair",
+    key_name="my-key-pair",
+    public_key=public_key)
+
+
+git_runner_instance = ec2.Instance('git-runner-instance',
+    instance_type=instance_type,
+    ami=ami,
+    subnet_id=public_subnet.id,
+    vpc_security_group_ids=[security_group.id],
+    key_name=key_pair.key_name,
+    tags={
+        'Name': 'git-runner-dev',
+    }
+)
+
+# Output the instance public IP addresses
+pulumi.export('git_runner_public_ip', git_runner_instance.public_ip)
