@@ -3,19 +3,20 @@ import pulumi_aws as aws
 import pulumi_aws.ec2 as ec2
 from pulumi_aws.ec2 import SecurityGroupRuleArgs
 
-# configuration 
+
+# Configuration
 config = pulumi.Config()
 instance_type = 't3.small'
 ami = "ami-0e86e20dae9224db8"
 
-#create a vpc
+
+# Create a VPC
 vpc = ec2.Vpc(
     'my-vpc',
     cidr_block='10.0.0.0/16',
     enable_dns_hostnames=True,
     enable_dns_support=True
 )
-
 
 # Create subnets
 public_subnet = ec2.Subnet('public-subnet',
@@ -52,7 +53,6 @@ public_route_table_association = ec2.RouteTableAssociation(
     route_table_id=public_route_table.id
 )
 
-
 # Elastic IP for NAT Gateway
 eip = ec2.Eip('nat-eip', vpc=True)
 
@@ -62,7 +62,6 @@ nat_gateway = ec2.NatGateway(
     subnet_id=public_subnet.id,
     allocation_id=eip.id
 )
-
 
 # Route Table for Private Subnet
 private_route_table = ec2.RouteTable(
@@ -80,4 +79,3 @@ private_route_table_association = ec2.RouteTableAssociation(
     subnet_id=private_subnet.id,
     route_table_id=private_route_table.id
 )
-
