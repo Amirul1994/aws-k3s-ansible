@@ -10,7 +10,7 @@ on:
       - main
 
 jobs:
-  setup_runner:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
