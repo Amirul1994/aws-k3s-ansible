@@ -1,10 +1,6 @@
 name: Setup GitHub Runner and Ansible
 
 on:
-  # workflow_run:
-  #  workflows: ["Deploy Infrastructure"]
-  #  types:
-  #   - completed
   push:
     branches:
       - main
@@ -41,20 +37,20 @@ jobs:
         run: pulumi login
 
       - name: Pulumi stack select
-        run:  |
+        run: |
           pulumi stack select amirul/aws-k3s-ansible/dev
 
       - name: Pulumi refresh
         run: |
           pulumi refresh --yes
-      
+
       - name: Set public key as github env
         run: echo "PUBLIC_KEY=${{ secrets.PUBLIC_KEY }}" >> $GITHUB_ENV
-      
+
       - name: Pulumi up
         run: |
           pulumi up --yes
-      
+
       - name: Save Pulumi outputs
         id: pulumi_outputs
         env:
@@ -69,20 +65,30 @@ jobs:
           echo "MASTER_IP=$MASTER_IP" >> $GITHUB_ENV
           echo "WORKER1_IP=$WORKER1_IP" >> $GITHUB_ENV
           echo "WORKER2_IP=$WORKER2_IP" >> $GITHUB_ENV
-      
+
       - name: Set up SSH agent
         uses: webfactory/ssh-agent@v0.5.3
         with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}  
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      - name: SSH to Runner EC2 and install GitHub Runner
+      # - name: SSH to Runner EC2 and install GitHub Runner
+      #   run: |
+      #     ssh -o StrictHostKeyChecking=no ubuntu@${{ env.GIT_RUNNER_IP }} << 'EOF'
+      #     mkdir actions-runner && cd actions-runner
+      #     curl -o actions-runner-linux-x64-2.319.1.tar.gz -L https://github.com/actions/runner/releases/download/v2.319.1/actions-runner-linux-x64-2.319.1.tar.gz
+      #     echo "3f6efb7488a183e291fc2c62876e14c9ee732864173734facc85a1bfb1744464 actions-runner-linux-x64-2.319.1.tar.gz" | shasum -a 256 -c
+      #     tar xzf ./actions-runner-linux-x64-2.319.1.tar.gz
+      #     ./config.sh --unattended --url https://github.com/amirul1994/aws-k3s-ansible --token A4NFFEZXN2PNRSJQAFQS54TGZCPVO --name "Git-runner"
+      #     sudo ./svc.sh install 
+      #     sudo ./svc.sh start
+      #     EOF
+
+      - name: SSH to Runner instance and install Ansible
         run: |
           ssh -o StrictHostKeyChecking=no ubuntu@${{ env.GIT_RUNNER_IP }} << 'EOF'
-          mkdir actions-runner && cd actions-runner
-          curl -o actions-runner-linux-x64-2.319.1.tar.gz -L https://github.com/actions/runner/releases/download/v2.319.1/actions-runner-linux-x64-2.319.1.tar.gz
-          echo "3f6efb7488a183e291fc2c62876e14c9ee732864173734facc85a1bfb1744464 actions-runner-linux-x64-2.319.1.tar.gz" | shasum -a 256 -c
-          tar xzf ./actions-runner-linux-x64-2.319.1.tar.gz
-          ./config.sh --unattended --url https://github.com/amirul1994/aws-k3s-ansible --token A4NFFEZXN2PNRSJQAFQS54TGZCPVO --name "Git-runner"
-          sudo ./svc.sh install 
-          sudo ./svc.sh start
+          sudo apt-get update -y
+          sudo apt install software-properties-common -y
+          sudo apt-add-repository --yes --update ppa:ansible/ansible
+          sudo apt-get install ansible -y
+          ansible --version
           EOF
