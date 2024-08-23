@@ -63,12 +63,3 @@ jobs:
           echo "MASTER_IP=$MASTER_IP" >> $GITHUB_ENV
           echo "WORKER1_IP=$WORKER1_IP" >> $GITHUB_ENV
           echo "WORKER2_IP=$WORKER2_IP" >> $GITHUB_ENV
-      
-      - name: Set up SSH agent
-        uses: webfactory/ssh-agent@v0.5.3
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}  
-
-      - name: SSH to Runner EC2 and install GitHub Runner
-        run: |
-          ssh -o StrictHostKeyChecking=no ubuntu@${{ env.GIT_RUNNER_IP }} << 'EOF' 
