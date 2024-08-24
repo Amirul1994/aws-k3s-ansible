@@ -5,9 +5,9 @@ on:
     workflows: ["deploy infra"]
     types:
       - completed
-  # push:
-  #   branches:
-  #     - main
+  push:
+    branches:
+      - main
 
 jobs:
   deploy:
