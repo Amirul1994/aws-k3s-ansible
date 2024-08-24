@@ -1,0 +1,14 @@
+- name: update and upgrade apt packages for ubuntu
+  apt:
+    update_cache: yes
+    upgrade: dist
+    force_apt_get: yes
+
+- name: install necessary dependencies
+  apt: 
+    name:
+      - curl
+      - wget 
+      - apt-transport-https
+      - ca-certificates
+    state: present
